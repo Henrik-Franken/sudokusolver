@@ -1,42 +1,52 @@
-def solve_sudoku(puzzle):
-    # Find the next empty cell (represented by a 0) in the puzzle
-    for i in range(len(puzzle)):
-        for j in range(len(puzzle[0])):
-            if puzzle[i][j] == 0:
-                # Try filling the cell with a number from 1 to 9
-                for k in range(1, 10):
-                    # Check if the move is valid
-                    if is_valid_move(puzzle, i, j, k):
-                        # Make the move
-                        puzzle[i][j] = k
-                        # Recursively try to solve the puzzle
-                        if solve_sudoku(puzzle):
-                            return puzzle
-                        # If the function returns False, reset the cell and try the next number
-                        puzzle[i][j] = 0
-                # If none of the numbers work, return False to the caller
-                return False
-    # If the function has iterated through all cells, the puzzle is solved
-    return puzzle
+def solve_sudoku(grid):
+    # function to find empty cell in grid
+    def find_empty():
+        for row in range(9):
+            for col in range(9):
+                if grid[row][col] == 0:
+                    return (row, col)
+        return None
 
-def is_valid_move(puzzle, row, col, num):
-    # Check if the number already exists in the same row
-    for i in range(len(puzzle[0])):
-        if puzzle[row][i] == num:
-            return False
-    # Check if the number already exists in the same column
-    for i in range(len(puzzle)):
-        if puzzle[i][col] == num:
-            return False
-    # Check if the number already exists in the same 3x3 subgrid
-    start_row = row - row % 3
-    start_col = col - col % 3
-    for i in range(3):
-        for j in range(3):
-            if puzzle[start_row + i][start_col + j] == num:
+    # function to check if number is valid in current position
+    def is_valid(num, row, col):
+        # check row
+        for i in range(9):
+            if grid[row][i] == num:
                 return False
-    # If the number is not present in the same row, column, or subgrid, it is a valid move
-    return True
+
+        # check col
+        for i in range(9):
+            if grid[i][col] == num:
+                return False
+
+        # check 3x3 grid
+        start_row = row - row % 3
+        start_col = col - col % 3
+        for i in range(3):
+            for j in range(3):
+                if grid[i + start_row][j + start_col] == num:
+                    return False
+        return True
+
+    # backtracking function
+    def backtrack():
+        empty = find_empty()
+        if not empty:
+            return True
+        row, col = empty
+
+        for num in range(1, 10):
+            if is_valid(num, row, col):
+                grid[row][col] = num
+                if backtrack():
+                    return True
+                grid[row][col] = 0
+        return False
+
+    if backtrack():
+        return grid
+    else:
+        return None
 
 # Example usage:
 puzzle = [
@@ -59,7 +69,7 @@ board = [
   [7, 0, 0, 0, 2, 0, 0, 0, 6],
   [0, 6, 0, 0, 0, 0, 2, 8, 0],
   [0, 0, 0, 4, 1, 9, 0, 0, 5],
-  [0, 0, 0, 0, 8, 0, 0, 7,9]
+  [0, 0, 0, 0, 8, 0, 0, 7, 9]
   ]
 #solve=solve_sudoku(puzzle)
 #print(solve)
