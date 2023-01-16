@@ -11,6 +11,10 @@ from PIL import Image, ImageTk
 from datetime import datetime
 
 def setmatrix(root,sudokuarray):
+    """Set Matrix of GUI
+    :param root: Required TK Object for printing Sudokuarray
+    :param sudokuarray: Required 9x9 Array
+    """
     entry='!entry'
     t=1
     for x in sudokuarray:
@@ -24,7 +28,10 @@ def setmatrix(root,sudokuarray):
             t=t+1
 
 def label_image(img,root):
-    #label image
+    """Label image on GUI
+    :param img: Required Image
+    :param root: Required TK Object for printing img
+    """
     if img!=[]:
         Imglbl=Label(root)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
@@ -37,6 +44,12 @@ def label_image(img,root):
         time.sleep(2)
 
 def get_contoursandcorner(origimg,img):
+    """Name
+    :param origimg:
+    :param img:
+    :return imgcont:
+    :return resultarray:
+    """
     kernelcl = np.ones((2,2),np.uint8)
 
     contoursimage=cv2.morphologyEx(img, cv2.MORPH_DILATE, kernelcl)
@@ -70,6 +83,11 @@ def get_contoursandcorner(origimg,img):
 
 
 def imagewarping(img,cornerposition):
+    """Warp Image Perspective
+    :param img: Required Grayscale
+    :param cornerposition: Required 2d array with four corner values [[lefttop],[leftbottom],[rightop],[rightbottom]]
+    :return:
+    """
     inputpts=np.array(cornerposition,dtype=np.float32)
     outputpts = np.array([[0, 0],[500, 0],[0, 500],[500, 500]],dtype=np.float32)
 
@@ -78,6 +96,10 @@ def imagewarping(img,cornerposition):
     return imgwarp
 
 def imagegrid(img):
+    """Subdivide Image into squares and convert image to number
+    :param img: Required Grayscale Image
+    :return: Grayscale Image
+    """
     img_blur = cv2.GaussianBlur(img, (3,3), 1) 
     img_thresh= cv2.adaptiveThreshold(img_blur, 255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY_INV,15,4)
 
@@ -98,6 +120,10 @@ def imagegrid(img):
     return cdstP
 
 def get_sudokugrid(img):
+    """Image2Array
+    :param img: Required Binaryimage with a 9x9 Sudokumatrix
+    :return: Sudoku as array
+    """
     sudoku_array=np.zeros((9,9))
     #unterteilen in quadrate
     höhe=img.shape[0]
@@ -121,6 +147,12 @@ def get_sudokugrid(img):
     return sudoku_array
 
 def imagecontrast(img,inputalpha=0,inputbeta=1.1):
+    """Change Imagecontract for more Contrast
+    :param img: Required Grayimage
+    :param inputalpha: <0 Lighter;>0 Darker
+    :param inputbeta: <1 less Contrast;>1 less Contrast
+    :return: customized image
+    """
     img=cv2.normalize(img, None, alpha=inputalpha, beta=inputbeta, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
     img= (255*img).astype(np.uint8)
     imggray=cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -129,6 +161,10 @@ def imagecontrast(img,inputalpha=0,inputbeta=1.1):
 
 
 def imageprocessing(img,root):
+    """Main Process function for Image Process; Set Grid Matrix
+    :param img: Image to process
+    :param root: Need to show process on GUI
+    """
     #Gray image
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     cv2.imwrite("sudokusolver/RecordedImages/sudokuimage.png",img)

@@ -6,7 +6,6 @@ from tkinter import *
 from PIL import Image, ImageTk
 import os
 import threading
-
 Filelist=0
 rows=0
 sudokuarray=np.ones((9,9),dtype=str)
@@ -23,7 +22,7 @@ pytesseract.pytesseract.tesseract_cmd=r'C:\Users\Frank\AppData\Local\Programs\Te
 
 
 def solvesudoku():
-    
+    """Solve Sudoku of GUI Matrix"""
     global sudokuarray
     sudokuarray=sudokuarray.astype('float32')
     getmatrix()
@@ -39,6 +38,7 @@ def solvesudoku():
     
 
 def imageprocess():
+    """Start Imageprocess in a new Thread for no freezing GUI"""
     global live
     global sudokuarray
     global listimage
@@ -59,6 +59,7 @@ def imageprocess():
             live=True
     
 def setmatrix():
+    """Set Gridmatrix of GUI by using GUI Variable root"""
     global sudokuarray
 
     entry='!entry'
@@ -74,6 +75,7 @@ def setmatrix():
             t=t+1
 
 def getmatrix():
+    """Get Gridmatrix of GUI by using Sudokumatrix Variable rows"""
     global sudokuarray
     global rows
     global dir_path
@@ -85,6 +87,9 @@ def getmatrix():
 
 
 def image_selected(event):
+    """Override Webcamimage with selected image of Listbox
+    :param event: not used because of no information
+    """
     global Filelist
     global live
     global listimage
@@ -104,7 +109,8 @@ def image_selected(event):
         wbimage.configure(image=imgtk)
 
 
-def showhomescreen(darkmode):
+def showhomescreen():
+    """Main-Function for Creating Grid an initiale Global Variables"""
     global Filelist
     global rows
     global sudokuarray
