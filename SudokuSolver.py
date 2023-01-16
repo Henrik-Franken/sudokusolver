@@ -1,3 +1,4 @@
+
 def solve_sudoku(grid):
     # function to find empty cell in grid
     def find_empty():

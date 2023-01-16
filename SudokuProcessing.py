@@ -1,76 +1,79 @@
 import cv2
 import numpy as np
 import time
-import sys
-import math
 from array import *
 import pytesseract
 from PIL import Image
 from SudokuSolver import *
+from scipy import spatial
 from tkinter import *
 from PIL import Image, ImageTk
+from datetime import datetime
+
+def setmatrix(root,sudokuarray):
+    entry='!entry'
+    t=1
+    for x in sudokuarray:
+        for y in x:
+            if t==1:
+                entrytmp=entry
+            else:
+                entrytmp=entry+str(t)
+            root.children['!frame'].children[entrytmp].delete(0,END)
+            root.children['!frame'].children[entrytmp].insert(0,int(y))
+            t=t+1
 
 def label_image(img,root):
     #label image
-    lmain=Label()
-    lmain.grid(row=2,column=2, padx='5', pady='5', sticky='ew')
-    img = Image.fromarray(img)
-    imgtk = ImageTk.PhotoImage(image=img)
-    lmain.imgtk = imgtk
-    lmain.configure(image=imgtk)
-    time.sleep(1)
+    if img!=[]:
+        Imglbl=Label(root)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
+        img= cv2.resize(img,(720,480))
+        img = Image.fromarray(img)
+        imgtk = ImageTk.PhotoImage(image=img)
+        Imglbl.imgtk = imgtk
+        Imglbl.configure(image=imgtk)
+        Imglbl.grid(row=2,column=2, padx='5', pady='5', sticky='ew')
+        time.sleep(2)
 
-def get_contours(img):
+def get_contoursandcorner(origimg,img):
     kernelcl = np.ones((2,2),np.uint8)
 
     contoursimage=cv2.morphologyEx(img, cv2.MORPH_DILATE, kernelcl)
     contours, _ = cv2.findContours(contoursimage, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     contours = sorted(contours, key=cv2.contourArea, reverse=True)
-
-    polygon = None
+    corner = None
     #Selected contours
     for i in contours:
         area = cv2.contourArea(i)
         perimeter = cv2.arcLength(i, closed=True)
         approx = cv2.approxPolyDP(i, 0.01 * perimeter, closed=True)
         num_corners = len(approx)
-
         if num_corners == 4 and area > 1000:
-            polygon = i
-            break
-
-    imgcont=cv2.drawContours(img, [polygon], 0, (0,0,0), 5)
-    imgcont=cv2.cvtColor(imgcont, cv2.COLOR_BGR2GRAY)
-    
-
-def draw_corner(img):
-    corners=cv2.goodFeaturesToTrack(img, maxCorners=4, qualityLevel=0.5, minDistance=150,useHarrisDetector=True,k=0.04)
-    cornerpositions=[]
-    #Check if 4 Corners are Selected
-
-    #Sort cornerpositions
-
-    x,y=corners[1].ravel()
-    cornerpositions[0]=lefttop_pts=[np.uint16(x),np.uint16(y)]
-    cv2.circle(img,lefttop_pts,5,(255,255,255),-1)
-    x,y=corners[2].ravel()
-    cornerpositions[1]=leftbottom_pts=[np.uint16(x),np.uint16(y)]
-    cv2.circle(img,leftbottom_pts,5,(255,255,255),-1)
-    x,y=corners[3].ravel()
-    cornerpositions[2]=rightbottom_pts=[np.uint16(x),np.uint16(y)]
-    cv2.circle(img,rightbottom_pts,5,(255,255,255),-1)
-    x,y=corners[0].ravel()
-    cornerpositions[3]=righttop_pts=[np.uint16(x),np.uint16(y)]
-    cv2.circle(img,righttop_pts,5,(255,255,255),-1)
-    
-    return img,cornerpositions
+            corner = i
+            imgcont=cv2.drawContours(origimg, [corner], 0, (0,0,0), 6)
+            for i in approx:
+                imgcont=cv2.circle(imgcont,i[0], 3, (255,255,255), -1)
+            #imgcont=cv2.cvtColor(imgcont, cv2.COLOR_BGR2GRAY)
+            #Sort approx array
+            resultarray=[[],[],[],[]]
+            inputarray=[[approx[0][0][0],approx[0][0][1]],[approx[1][0][0],approx[1][0][1]],[approx[2][0][0],approx[2][0][1]],[approx[3][0][0],approx[3][0][1]]]
+            imgsize=[[0,0],[origimg.shape[1],0],[0,origimg.shape[0]],[720,480]]
+            tree=spatial.KDTree(inputarray)
+            for x in range(0,4):
+                _,result=tree.query(imgsize[x])
+                resultarray[x]=inputarray[result]
+                
+            return imgcont,resultarray
+            
+    return [],[]
 
 
 def imagewarping(img,cornerposition):
-    
-    outputpts = np.array([[0, 0],[500, 500],[500, 0],[0, 500]],dtype=np.float32)
+    inputpts=np.array(cornerposition,dtype=np.float32)
+    outputpts = np.array([[0, 0],[500, 0],[0, 500],[500, 500]],dtype=np.float32)
 
-    PT=cv2.getPerspectiveTransform(cornerposition,outputpts)
+    PT=cv2.getPerspectiveTransform(inputpts,outputpts)
     imgwarp=cv2.warpPerspective(img,PT,(500,500),flags=cv2.INTER_LINEAR)
     return imgwarp
 
@@ -88,12 +91,13 @@ def imagegrid(img):
     blank_image=255-blank_image
     if linesP is not None:
         for i in range(0, len(linesP)):
+            #Grid wird nicht komplett ausgefüllt
             l = linesP[i][0]
             cv2.line(blank_image, (l[0], l[1]), (l[2], l[3]), (0,0,0), 3, cv2.LINE_AA)
             cv2.line(cdstP, (l[0], l[1]), (l[2], l[3]), (0,0,0), 3, cv2.LINE_AA)
     return cdstP
 
-def get(img):
+def get_sudokugrid(img):
     sudoku_array=np.zeros((9,9))
     #unterteilen in quadrate
     höhe=img.shape[0]
@@ -116,23 +120,37 @@ def get(img):
         sudoku_array[h]=linearray
     return sudoku_array
 
-def imagecontrast(img,inputalpha,inputbeta=1.1):
+def imagecontrast(img,inputalpha=0,inputbeta=1.1):
     img=cv2.normalize(img, None, alpha=inputalpha, beta=inputbeta, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
     img= (255*img).astype(np.uint8)
     imggray=cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
     return imggray
 
-def imageprocessing(cam,root):
-    print("Imageprocessing")
-    #Read Webcam Image
-    _, frame = cam.read()
-    img_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    
-    #Preprocessing Image
 
+def imageprocessing(img,root):
+    #Gray image
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    cv2.imwrite("sudokusolver/RecordedImages/sudokuimage.png",img)
+    #Preprocessing Image
+    label_image(img_gray,root)
     # Blur the image for better edge detection
     img_blur = cv2.GaussianBlur(img_gray, (5,5), 1)
     img_thresh= cv2.adaptiveThreshold(img_blur, 255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY_INV,11,2)
+    img_contours,corner=get_contoursandcorner(img_gray,img_thresh)
+    label_image(img_contours,root)
+
+    img_roi=imagewarping(img_contours,corner)
+    label_image(img_roi,root)
+
+    img_grid=imagegrid(img_roi)
+    img_grid=imagecontrast(img_grid)
+    label_image(img_grid,root)
+
+    sudokuarray=get_sudokugrid(img_grid)
+    setmatrix(root,sudokuarray)
+
+
 
     
     
