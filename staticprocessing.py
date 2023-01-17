@@ -1,3 +1,6 @@
+#OLD Version 
+#Please use main.py
+
 import cv2
 import numpy as np
 import time
@@ -8,7 +11,7 @@ import pytesseract
 from PIL import Image
 from SudokuSolver import *
 pytesseract.pytesseract.tesseract_cmd=r'C:\Users\Frank\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
-img=cv2.imread("sudokusolver\opencv_frame_0.jpg")
+img=cv2.imread("sudokusolver\RecordedImages\opencv_frame_29.png")
 x=0
 sudoku_array=np.zeros((9,9))
 #Preprocess

@@ -198,4 +198,4 @@ def showhomescreen():
     Filelist.grid(row=2,column=0, padx='5', pady='5', sticky='ew')
 
     root.mainloop()
-showhomescreen(1)
+showhomescreen()
