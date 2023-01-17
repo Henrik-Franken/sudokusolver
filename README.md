@@ -16,7 +16,7 @@ Modify read in numbers
 ## Known_Issues
 Due to the limited time, errors may occur during use. The following is a list of known errors:
 * Reliable reading of numbers
-* Not detect the webcam -> main.py:17
+* Not detect the webcam -> main.py:17 ::Change Number
 * No reading of numbers -> main.py:20 ::Change to your Path
 
 ## Usage
