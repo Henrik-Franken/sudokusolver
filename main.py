@@ -14,10 +14,10 @@ live=True
 listimage=[]
 dir_path=r'sudokusolver/RecordedImages'
 width, height = 600, 400
-cap = cv2.VideoCapture(2)
+cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
-pytesseract.pytesseract.tesseract_cmd=r'C:\Users\Frank\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
+pytesseract.pytesseract.tesseract_cmd=r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 
 
@@ -155,14 +155,15 @@ def showhomescreen():
     
     #SudokuGrid
     gridFrame=Frame(root)
-    gridFrame.grid(row=5,column=2, padx='5', pady='5', sticky='ew')
+    gridFrame.grid(row=2,column=3, padx='5', pady='5', sticky='ew')
+    gridFrame.configure(background='black')
     
     rows = []
     for i in range(9):
         cols = []
         for j in range(9):
-            e = Entry(gridFrame,width=5,bd=7,)
-            e.grid(row=i, column=j, sticky=NSEW)
+            e = Entry(gridFrame,width=4,)
+            e.grid(row=i, column=j,padx=1,pady=1, sticky=NSEW)
             cols.append(e)
         rows.append(cols)
 
