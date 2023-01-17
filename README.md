@@ -2,6 +2,7 @@
 * [Motivation](#motivation)
 * [Features](#features)
 * [Known Issues](#known_issues)
+* [Limitations](#Limitations)
 * [Usage](#usage)
 
 ## Motivation
@@ -19,6 +20,8 @@ Due to the limited time, errors may occur during use. The following is a list of
 * Not detect the webcam -> main.py:17 ::Change Number
 * No reading of numbers -> main.py:20 ::Change to your Path
 
+## Limitations
+Since the OCR engine Tesseract is only available for Windows, the application is limited to computers with an installed Windows operating system (Win10+)
 ## Usage
 To use the program you need python 3.0 or higher
 Additionally, you need the OCR engine Tesseract to convert the numbers (https://github.com/tesseract-ocr/tesseract)
