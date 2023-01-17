@@ -24,7 +24,7 @@ Due to the limited time, errors may occur during use. The following is a list of
 Since the OCR engine Tesseract is only available for Windows, the application is limited to computers with an installed Windows operating system (Win10+)
 ## Usage
 To use the program you need python 3.0 or higher
-Additionally, you need the OCR engine Tesseract to convert the numbers (https://github.com/tesseract-ocr/tesseract)
+Additionally, you need the OCR engine Tesseract to convert the numbers (https://github.com/UB-Mannheim/tesseract/wiki)
 To install the following packages you need pip or an alternative package installer (https://pip.pypa.io/en/stable/installation/)
 ~~~~~~~~~~~~~{.cpp}
 pip install opencv-python
